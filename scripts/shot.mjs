@@ -137,30 +137,30 @@ async function checkPage(browser, port, scenario) {
     }
     await evaluate("document.fonts.ready.then(() => true)");
     const page = await evaluate(`(() => {
-      const heading = document.querySelector("main > h1");
+      const heading = document.querySelector("main h1");
       const bounds = heading?.getBoundingClientRect();
       return {
         title: document.title,
         language: document.documentElement.lang,
         heading: heading?.textContent,
         headings: document.querySelectorAll("h1").length,
-        introduction: document.querySelector("main > p")?.textContent,
+        introduction: document.querySelector(".game-intro")?.textContent,
         viewport: document.querySelector('meta[name="viewport"]')?.content,
         assets: [...document.querySelectorAll('script[type="module"][src], link[rel="stylesheet"]')]
           .map(element => element.src || element.href),
         styled: heading ? parseFloat(getComputedStyle(heading).fontSize) >= 32 &&
-          getComputedStyle(document.body).display === "grid" &&
-          getComputedStyle(document.documentElement).backgroundColor === "rgb(248, 250, 252)" : false,
+          getComputedStyle(document.body).margin === "0px" &&
+          Boolean(document.querySelector("#game-board")) : false,
         fits: bounds ? bounds.left >= 0 && bounds.right <= innerWidth &&
           bounds.top >= 0 && bounds.bottom <= innerHeight &&
           document.documentElement.scrollWidth <= innerWidth : false
       };
     })()`);
-    assert.equal(page.title, "Hello, world!");
+    assert.equal(page.title, "Snake — Field Notes Arcade");
     assert.equal(page.language, "en");
-    assert.equal(page.heading, "Hello, world!");
+    assert.equal(page.heading, "Snake.");
     assert.equal(page.headings, 1);
-    assert.equal(page.introduction, "Your next static web app starts here.");
+    assert.equal(page.introduction, "One more apple. One more turn. Don't get in your own way.");
     assert.equal(page.viewport, "width=device-width, initial-scale=1.0");
     assert.ok(page.styled, "The built stylesheet must affect the heading.");
     assert.ok(page.fits, "The heading must fit the viewport without horizontal overflow.");
